@@ -26,8 +26,8 @@ options:NSNumericSearch] !=       \
 NSOrderedDescending)
 @interface HyPopMenuView ()
 
-@property (nonatomic, weak) UIView* superView;
-@property (nonatomic, weak) UIView* backgroundView;
+@property (nonatomic, weak) UIView* suView;
+@property (nonatomic, weak) UIVisualEffectView* backgroundView;
 @property (nonatomic, weak) UIButton* disappearButton;
 @property (nonatomic, weak) UIView* bottomView;
 @property (nonatomic, assign) BOOL isOpen;
@@ -77,11 +77,11 @@ static BOOL isAlpha = false;
     UIView* bottomView = [_backgroundView viewWithTag:2];
     if (!bottomView) {
         bottomView = [UIView new];
-        [_backgroundView addSubview:bottomView];
+        [_backgroundView.contentView addSubview:bottomView];
         UIView *superView = [UIView new];
         superView.frame = _backgroundView.frame;
-        [_backgroundView addSubview:superView];
-        _superView = superView;
+        [_backgroundView.contentView addSubview:superView];
+        _suView = superView;
         [bottomView setTag:2];
         _bottomView = bottomView;
     }
@@ -97,7 +97,7 @@ static BOOL isAlpha = false;
     if (!disappearButton) {
         disappearButton = [UIButton buttonWithType:UIButtonTypeCustom];
         disappearButton.adjustsImageWhenHighlighted = NO;
-        [_backgroundView addSubview:disappearButton];
+        [_backgroundView.contentView addSubview:disappearButton];
         disappearButton.tag = 3;
         _disappearButton = disappearButton;
     }
@@ -112,10 +112,10 @@ static BOOL isAlpha = false;
 {
     [self addNotificationAtNotificationName:HyPopMenuViewWillShowNotification];
     //_delegate = (id)[self currentViewController];
-    UIView* backgroundView = [self effectsViewWithType:_backgroundType];
+    UIVisualEffectView* backgroundView = [self effectsViewWithType:_backgroundType];
     _backgroundView = backgroundView;
     if (_topView) {
-        [_backgroundView addSubview:_topView];
+        [_backgroundView.contentView addSubview:_topView];
     }
     [self addSubview:_backgroundView];
     [self initUIsize];
@@ -201,7 +201,7 @@ static BOOL isAlpha = false;
         model.automaticIdentificationColor = weakView.automaticIdentificationColor;
         [model.customView removeFromSuperview];
         model.customView.alpha = 0.0f;
-        [weakView.superView addSubview:model.customView];
+        [weakView.suView addSubview:model.customView];
 
         CGRect toRect;
         CGRect fromRect;
@@ -249,6 +249,8 @@ static BOOL isAlpha = false;
         PopMenuButton* button = (id)model.customView;
         [button addTarget:self action:@selector(selectedFunc:) forControlEvents:UIControlEventTouchUpInside];
     }];
+    
+ 
 }
 
 - (void)classAnimationWithfromRect:(CGRect)age1
@@ -435,8 +437,9 @@ static BOOL isAlpha = false;
         }
     }
     effectView.frame = self.bounds;
+    NSLog(@"%d",isAlpha);
     if (isAlpha) effectView.alpha = 0.0f;
-    _superView.frame = _backgroundView.bounds;
+    _suView.frame = _backgroundView.bounds;
     return effectView;
 }
 
@@ -533,7 +536,7 @@ static BOOL isAlpha = false;
 {
     __weak HyPopMenuView* weakView = self;
     [UIView animateWithDuration:0.5 delay:0.0 options:0 animations:^{
-        _superView.alpha=0.0;
+        _suView.alpha=0.0;
         if (isAlpha) {
             [weakView.backgroundView setAlpha:0];
         }else{
@@ -774,3 +777,4 @@ NSString* const HyPopMenuViewWillShowNotification = @"HyPopMenuViewWillShowNotif
 NSString* const HyPopMenuViewDidShowNotification = @"HyPopMenuViewDidShowNotification";
 NSString* const HyPopMenuViewWillHideNotification = @"HyPopMenuViewWillHideNotification";
 NSString* const HyPopMenuViewDidHideNotification = @"HyPopMenuViewDidHideNotification";
+
